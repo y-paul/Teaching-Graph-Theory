@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Graph-Theorie</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dipl.-Psych. Yannik Paul" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="my-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: left, top, title-slide
+
+.title[
+# Graph-Theorie
+]
+.subtitle[
+## eine Einführung mit vier Anwendungsfällen
+]
+.author[
+### Dipl.-Psych. Yannik Paul
+]
+.institute[
+### Christian-Albrechts-University Kiel
+]
+.date[
+### 03.12.2022
+]
+
+---
+
+
+
+
+
+
+
+
+<div>
+<style type="text/css">.xaringan-extra-logo {
+width: 180px;
+height: 60px;
+z-index: 0;
+background-image: url(logo.png);
+background-size: contain;
+background-repeat: no-repeat;
+position: absolute;
+top:0em;right:0em;
+}
+</style>
+<script>(function () {
+  let tries = 0
+  function addLogo () {
+    if (typeof slideshow === 'undefined') {
+      tries += 1
+      if (tries < 10) {
+        setTimeout(addLogo, 100)
+      }
+    } else {
+      document.querySelectorAll('.remark-slide-content:not(.title-slide):not(.inverse):not(.hide_logo)')
+        .forEach(function (slide) {
+          const logo = document.createElement('div')
+          logo.classList = 'xaringan-extra-logo'
+          logo.href = null
+          slide.appendChild(logo)
+        })
+    }
+  }
+  document.addEventListener('DOMContentLoaded', addLogo)
+})()</script>
+</div>
+
+
+
+
+
+
+# Gliederung
+
+- Basics: Graphen, Knoten, Kanten
+- Beispiel Wortnetzwerke
+- Beispiel Geodaten
+- Beispiel Soziale Netzwerke
+- Beispiel Hyperlinks
+
+
+---
+
+
+# Was ist ein Graph?
+
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-1-1.png" width="1080" /&gt;
+
+- **Netwerk**: Graph
+- **Verbindungen**: Kanten (Edges)
+- **Kreise**: Knoten (Nodes/Vertex)
+
+
+---
+
+# Graphen = Tabellen
+
+- Tabelle und Graph sind äquivalent!
+- Das eine kann in das andere überführt werden
+
+
+
+
+
+.pull-left[
+
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="504" /&gt;
+]
+
+
+.pull-right[
+
+
+| Node From|    Node To     |
+|----------|:-------------:|
+| A |  B |
+| B |    C   |
+| B | D |
+
+
+
+
+]
+
+
+
+---
+class: center
+### Star
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-3-1.png" width="504" /&gt;
+
+
+
+---
+class: center
+
+### Tree
+&lt;img src="presentation_files/figure-html/unnamed-chunk-4-1.png" width="504" /&gt;
+
+
+
+---
+class: center
+
+### Small World
+&lt;img src="presentation_files/figure-html/unnamed-chunk-5-1.png" width="504" /&gt;
+
+---
+class: center
+### Tree (directed)
+&lt;img src="presentation_files/figure-html/unnamed-chunk-6-1.png" width="504" /&gt;
+
+
+
+---
+class: inverse, center
+
+# Beispiel:
+### Wortnetzwerke
+
+
+---
+
+# Warum Wortanalyse?
+
+Wir möchten Fließtexte natürlicher Sprache analysieren, beispielsweise:
+
+- Freitextantworten in Fragebüchern
+- Social Media
+- Hausaufgaben
+- Prosa
+- ...
+
+---
+
+# Wie analysieren?
+
+- Einfach lesen, Meinung bilden
+  + Problem: Qualitativ, bei großer Menge schwierig, Verzerrungstendenzen
+- Content-Rating
+  + Besser: Weniger subjektiv
+  + Problem: mehrere Personen, Widersprüche, Schulungen, Ratinginstrumente
+- Worthäufigkeiten:
+  + Besser: relativ leicht auszuwerten
+  + Problem: Wörter funktionieren immer nur in ihrem semantischem Kontext, keine Information über Struktur des Textes
+  
+  
+&lt;br&gt;&lt;br&gt;
+.center[
+.pull-left[
+*Komm', wir essen Opa.*
+]
+
+
+
+.pull-right[
+*Komm' wir essen, Opa.*
+]
+
+]
+
+---
+
+# Graph Theorie
+
+- Wir brauchen eine Methode, mit der wir Wörter und ihre Organisation im Kontext zueinander betrachten können
+  + Möglichkeit für quantitative Schlüsse?
+- Graph Theorie als Lösung:
+  + Vertices: Wörter
+  + Edges: Wörter werden zusammen genannt
+
+---
+# Schritt 1: Vorbereitung
+
+
+.pull-left[
+&gt;Yannik backt gerne Kuchen.
+&gt;
+&gt;Max isst gerne Kuchen.
+&gt;
+&gt;Kuchen kann Yannik beim Bäcker kaufen.
+
+]
+
+.pull-right[
+- wir brauchen wieder Groß- und Kleinschreibung, Satzzeichen, inhaltlich unbedeutende Wörter
+- Rausschmeißen!
+]
+
+
+
+---
+
+# Schritt 1: Vorbereitung
+
+
+.pull-left[
+&gt;yannik backt ~~gerne~~ kuchen
+&gt;
+&gt;max isst ~~gerne~~ kuchen
+&gt;
+&gt;kuchen ~~kann~~ yannik ~~beim~~ bäcker kaufen
+
+]
+
+.pull-right[
+- Wörter via bspw. ISO-Norm identifizieren
+]
+
+
+---
+
+
+# Schritt 2: Edge-Table erstellen
+
+
+.pull-left[
+&gt;**yannik** *backt* kuchen
+]
+
+.pull-right[
+| Node From|    Node To     |    Weight     |
+|----------|:-------------:|:-------------:|
+| yannik |  backt |   1    |
+]
+
+
+---
+
+# Schritt 2: Edge-Table erstellen
+
+
+.pull-left[
+&gt;**yannik** backt *kuchen*
+]
+
+.pull-right[
+| Node From|    Node To     |    Weight     |
+|----------|:-------------:|:-------------:|
+| yannik |  backt |   1    |
+| yannik | kuchen |   1    |
+]
+
+
+---
+
+# Schritt 2: Edge-Table erstellen
+
+
+.pull-left[
+&gt;~~yannik~~ **backt** *kuchen*
+]
+
+.pull-right[
+
+| Node From|    Node To     |    Weight     |
+|----------|:-------------:|:-------------:|
+| yannik |  backt |   1    |
+| yannik | kuchen |   1    |
+| backt  | kuchen |    1   |
+
+]
+
+
+
+
+---
+
+# Schritt 2: Edge-Table erstellen
+
+
+
+| Node From|    Node To     |    Weight     |
+|----------|:-------------:|:-------------:|
+| yannik |  backt |   1    |
+| yannik | kuchen |   **2**    |
+| backt  | kuchen |    1   |
+| max  | isst |    1   |
+| max  | kuchen |    1   |
+| isst  | kuchen |    1   |
+| kuchen  | bäcker |    1   |
+| ...  | ... |    ...   |
+
+- **Wenn eine Verbindung doppelt vorkommt Weight um 1 erhöhen!**
+
+---
+
+# Schritt 3: Auswertung
+
+
+Zwei Möglichkeiten:
+- Graphische Auswertung: Deskriptiv
+- Numerische Auswertung: Quantitativ
+
+
+
+---
+
+# Graphische Auswertung
+
+- Layout-Algorithmen
+
+![Layout with FR](pics/layout_fr.PNG)
+
+- Bspw. Fruchtman-Reingold, Force-Atlas...
+
+---
+class: center
+
+# Graphische Auswertung:
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-7-1.png" width="504" /&gt;
+
+---
+
+# Numerische Auswertung
+
+
+- **Mittlere Pfadlänge:** 1.476
+  + Wie viele Schritte brauche ich im Schnitt, um von A zu B zu kommen
+- **Durchschnittlicher Clustering Coefficient:** 0.857
+  + Wie stark sind meine Knoten vernetzt?
+  
+---
+
+# Numerische Auswertung
+
+
+- Viele weitere Kennwerte
+- die meisten davon erst aussagekräftig, wenn verglichen mit Kennwerten anderer Netzwerke
+- Können auch nur für einzelne Knoten berechnet werden
+
+
+
+---
+class: center, inverse
+
+# Beispiel: Songlyrics
+
+
+---
+class: center
+
+
+![Taylor Swift](https://image.stern.de/7523420/t/Lt/v3/w1440/r1.3333/-/taylor-swift-bei-den-grammys.jpg)
+
+
+
+
+---
+# Datensatz
+
+- [🢅 Datensatz](https://www.kaggle.com/datasets/PromptCloudHQ/taylor-swift-song-lyrics-from-all-the-albums) von Song-Lyrics von Taylor Swift für alle Alben bis 2017
+- Vorgehen analog wie Beispiel vorher
+- Vorverarbeitung mit R, Layouting mit [🢅 Gephi](https://gephi.org/)
+- Zusätzlich: Für jedes Wort Sentiment-Analyse
+  + auf einer Skala von -5 bis +5 Negativität/Positivität des Wortes
+
+
+---
+# Layouting
+
+&lt;iframe src="https://cloud.rz.uni-kiel.de/index.php/s/WeaeNPkZ4HzGDDL" width="100%" height="400px"&gt;&lt;/iframe&gt;
+
+
+
+---
+class: bgblack, center
+
+# Gesamtnetzwerk
+
+&lt;img src="pics/complete_ts_network_wo_label.png" width="450px" /&gt;
+
+---
+class: bgblack, center
+# Gesamtnetzwerk
+&lt;img src="pics/core_network.png" width="600px" /&gt;
+
+---
+class: bgblack, center
+# Gesamtnetzwerk
+&lt;img src="pics/outside_hub.png" width="300px" /&gt;
+
+&lt;img src="pics/hub2.png" width="300px" /&gt;
+
+
+
+---
+class: bgblack, center
+
+#Vergleich
+
+&lt;img src="pics/network_compare.png" width="2560" /&gt;
+
+
+---
+#Vergleich
+
+
+
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-15-1.png" width="504" /&gt;
+---
+#Takeaway
+
+- wenn sie erfolgreich mit ihrer Musik sein wollen, machen sie ihre Texte nicht zu komplex - die Leute mögen das nicht!
+
+- Wichtige Limitationen:
+  + Spotify Streams
+  + kleine Effektstärke
+  + ...
+
+---
+# Weitere mögliche Anwendungen
+
+- Tagebücher
+- Hausaufgaben
+- Therapieanträge
+- Fachtexte
+- ...
+
+
+
+---
+class: inverse, center
+# Beispiel 2: Maps-Data
+
+
+---
+# Maps Data
+
+- Google Maps Daten von April 2020 und Febuar 2022
+- sehr ausführliche aber auch intransparente Daten
+- Orte: Knoten
+- Bewegung zwischen Orten: Kanten
+
+
+---
+class: center
+
+# Daten
+
+![Maps 1](pics/maps1.PNG)
+
+---
+class: center
+
+# Daten
+
+![Maps 2](pics/maps2.PNG)
+
+---
+
+class: center
+
+# Daten
+
+![Maps 3](pics/maps3.PNG)
+
+
+---
+# Auswertung
+
+- finale Daten die verwendet wurden:
+  + Location Stamps ("Place Visited")
+  + es wird angenommen, das zwischen den Orten sich von Ort A zu B bewegt wurde (Kante)
+  + kann nicht ganz hinkommen, lässt sich aber leicht aus den Daten extrahieren
+
+- Vorgehen ansonsten analog zu vorherigem
+  + Edges sind diesmal directed
+  + kein Einbezug von Gewichten
+
+
+
+---
+class: center
+# 2022
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-16-1.png" width="504" /&gt;
+
+
+---
+class: center
+
+# 2022
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-17-1.png" width="504" /&gt;
+- Layout mit FR
+
+
+---
+class: center
+# 2020
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-18-1.png" width="504" /&gt;
+
+
+---
+class: center
+
+# 2022
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-19-1.png" width="504" /&gt;
+- Layout mit FR
+
+
+---
+
+# Vergleich
+
+
+|Dataset |   CC|  MMP|    MD|
+|:-------|----:|----:|-----:|
+|2020    | 0.21| 2.10| 11.00|
+|2022    | 0.13| 2.57|  9.48|
+
+- *CC*: Clustering Coefficient
+- *MMP*: Mean Minimum Path Length
+- *MD*: Mean Degree
+
+
+---
+# Anwendung
+
+.center[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-21-1.png" width="504" /&gt;
+]
+
+- Graphen von Patient:innen?
+- Wie verändern die sich?
+- Und was müssen wir Patient:innen dann eigentlich raten?
+
+
+---
+class: inverse, center
+
+# Beispiel: Sozialkontakte
+
+
+---
+# Sozialkontakte als Graph
+
+.center[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-22-1.png" width="504" /&gt;
+
+]
+
+
+
+
+
+---
+# Beispiel: Rating von Sozialumfeld
+
+- Frage: Wen haben Sie letzte Woche alles getroffen?
+  + alle auflisten
+  + sich selber mit in die Liste aufnehmen
+- Dann für jede Doppelkombination einschätzen: Wie gut kennen Sie/die jeweiligen Personen sich?
+  + Rating auf Skala von 0 (kennen sich gar nicht) zu 7 (wie Familie)
+  + am Ende alle Edges mit 0 aus dem Datensatz filtern
+- Dann automatisch Knoten (Leute/ich) und Kanten mit Gewichten (Rating)
+
+
+---
+# Daten
+
+- mit reduzierten Daten durchgeführt
+  + Ratings explodieren!
+  + "Nur" 12 Kontakte = über 60 Ratings
+
+
+---
+# Network
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-23-1.png" width="504" /&gt;
+
+
+---
+# Anwendung
+
+.center[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-24-1.png" width="504" /&gt;
+]
+
+- Wie sehen Netzwerke von Patient:innen aus mit:
+  + Depression?
+  + Angststörungen?
+- Was müssen wir Patient:innen dann eigentlich raten?
+- und gibt es ein Zuviel?
+- Was passiert wenn mir nicht zentral in diesem Netzwerk liegen?
+
+
+---
+class: inverse, center
+
+#Beispiel 4: Hyperlinks in Wikiepdia
+
+
+---
+# Hyperlinks
+
+- Internetseiten verlinken aufeinander
+- verstehen wir Internetseiten als Knoten, dann können wir Links als Kanten in Netzwerken verstehen!
+- Wikipedia als Spiegel von
+  + öffentlichen Wissen über psychische Störungen
+  + Wahrgenommene "Relevanz" von psychischen Störungen in der Öffentlichkeit?
+
+---
+# Datensatz
+- Jeweils der Wikipedia-Artikel von "Depression" und "Angststörung" gecrawlt
+- Alle Links auf andere Wikipedia-Artikel gesammelt
+  + Knotenverbindungen in der Node-Tabelle!
+- Alle diese Links nochmal gecrawlt, wenn der Subartikel auf einen anderen Subartikel verlinkt (der bereits in der Tabelle war), dann wird diese Verlinkung zwischen den beiden Artikeln aufgenommen
+  + also nur eine Ebene "tief"
+
+
+---
+# Beispiel
+
+
+|from             |to                                 |
+|:----------------|:----------------------------------|
+|/wiki/Depression |/wiki/ICD-10                       |
+|/wiki/Depression |/wiki/Affektive_St%C3%B6rung       |
+|/wiki/Depression |/wiki/Schizophrenie                |
+|/wiki/Depression |/wiki/Schizoaffektive_St%C3%B6rung |
+|/wiki/Depression |/wiki/Bipolare_St%C3%B6rung        |
+|/wiki/Depression |/wiki/Angstst%C3%B6rung            |
+
+
+---
+class: center, bgblack
+# Graphen
+
+.pull-left[
+&lt;img src="wikipedia/depression_graph.png" width="400px" /&gt;
+]
+
+.pull-right[
+&lt;img src="wikipedia/anxiety_graph.png" width="400px" /&gt;
+]
+
+
+
+---
+# Numerischer Vegleich
+
+
+|Dataset        |   CC|  MMP|    MD|
+|:--------------|----:|----:|-----:|
+|Depression     | 0.14| 3.49| 38.07|
+|Angststörungen | 0.25| 2.98| 37.85|
+
+
+
+---
+class: inverse, center
+
+# Fragen?
+
+
+---
+class: inverse, center
+
+# Danke für die Aufmerksamkeit!
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
