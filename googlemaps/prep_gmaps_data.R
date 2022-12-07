@@ -4,7 +4,7 @@ library(igraph)
 library(ggmap)
 
 # put in your api key
-#register_google("YOUR_API_KEY", write=T)
+#register_google("YOUR_API_", write=T)
 
 
 
